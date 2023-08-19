@@ -2,20 +2,33 @@ package handlers
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/tomerg2/mini-hacker-news/db_client"
 	"github.com/tomerg2/mini-hacker-news/repositories"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetPosts(c *gin.Context) {
-	posts, err := repositories.GetPosts()
+	logrus.Infof("Connecting to DB")
+	dbClient, err := db_client.GetMongoClient()
+	if err != nil {
+		logrus.Error("Failed connect to MongoDB")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	logrus.Infof("Fetching posts from DB")
+	startTime := time.Now()
+	posts, err := repositories.GetPosts(dbClient)
 	if err != nil {
 		logrus.Error("Failed to fetch posts")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
+	elapsedTime := time.Since(startTime)
+	logrus.Infof("Fetching posts completed [posts=%d] [latency=%v]", len(posts), elapsedTime)
 
-	logrus.Infof("Fetch %d posts", len(posts))
 	c.JSON(http.StatusOK, gin.H{"posts": posts})
 }
