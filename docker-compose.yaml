@@ -12,17 +12,17 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  hacker_server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: hacker_server
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mongodb
-    environment:
-      MONGO_URL: ${MONGO_URL}
+#  hacker_server:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: hacker_server
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mongodb
+#    environment:
+#      MONGO_URL: ${MONGO_URL}
 
 volumes:
   mongodb_data:
