@@ -28,8 +28,8 @@ func GetPosts(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	elapsedTime := time.Since(startTime)
-	logrus.Infof("Fetching posts completed [posts=%d] [latency=%v]", len(posts), elapsedTime)
+	elapsedTime := time.Since(startTime).Milliseconds()
+	logrus.Infof("Fetching posts completed [posts=%d] [milliseconds=%v]", len(posts), elapsedTime)
 
 	response := dtos.ResponsePosts{
 		Posts: posts,
