@@ -2,16 +2,18 @@
 
 FROM golang:1.18
 
-WORKDIR /app
+# set work dir in order to enable go-acc to run from test.sh
+WORKDIR /build/mini-hacker-news
 
-COPY go.mod go.sum ./
+# copy requirements
+ADD ./go.mod /build/mini-hacker-news/
+ADD ./go.sum /build/mini-hacker-news/
+
+# build and install the source code
 RUN go mod download
 
-COPY *.go ./
+# copy source code
+ADD . /build/mini-hacker-news/
+RUN go build .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /mini-hacker-news
-
-EXPOSE 8080
-
-# Run
-CMD ["/mini-hacker-news"]
+ENTRYPOINT ["/build/mini-hacker-news/mini-hacker-news"]
