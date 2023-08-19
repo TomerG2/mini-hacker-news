@@ -15,20 +15,15 @@ func GetPosts(db *mongo.Database) ([]models.Post, error) {
 	defer cancel()
 
 	postsCollection := db.Collection(db_client.POSTS_COLLECTION)
-	cur, err := postsCollection.Find(ctx, bson.M{})
+	cursor, err := postsCollection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
+	defer cursor.Close(ctx)
 
-	var posts []models.Post
-	for cur.Next(ctx) {
-		var post models.Post
-		if err := cur.Decode(&post); err != nil {
-			return nil, err
-		}
-		posts = append(posts, post)
+	posts := []models.Post{}
+	if err = cursor.All(ctx, &posts); err != nil {
+		return nil, err
 	}
-
 	return posts, nil
 }

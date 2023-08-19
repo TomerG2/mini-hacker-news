@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/tomerg2/mini-hacker-news/api/dtos"
 	"github.com/tomerg2/mini-hacker-news/db_client"
 	"github.com/tomerg2/mini-hacker-news/repositories"
 	"net/http"
@@ -14,7 +15,7 @@ func GetPosts(c *gin.Context) {
 	logrus.Infof("Connecting to DB")
 	dbClient, err := db_client.GetMongoClient()
 	if err != nil {
-		logrus.Error("Failed connect to MongoDB")
+		logrus.Errorf("Failed connect to DB [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
@@ -23,12 +24,15 @@ func GetPosts(c *gin.Context) {
 	startTime := time.Now()
 	posts, err := repositories.GetPosts(dbClient)
 	if err != nil {
-		logrus.Error("Failed to fetch posts")
+		logrus.Errorf("Failed to fetch posts [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	elapsedTime := time.Since(startTime)
-	logrus.Infof("Fetching posts completed [posts=%d] [latency=%v]", len(posts), elapsedTime)
+	elapsedTime := time.Since(startTime).Milliseconds()
+	logrus.Infof("Fetching posts completed [posts=%d] [milliseconds=%v]", len(posts), elapsedTime)
 
-	c.JSON(http.StatusOK, gin.H{"posts": posts})
+	response := dtos.ResponsePosts{
+		Posts: posts,
+	}
+	c.JSON(http.StatusOK, response)
 }
