@@ -21,7 +21,7 @@ func GetPosts(db *mongo.Database) ([]models.Post, error) {
 	}
 	defer cursor.Close(ctx)
 
-	var posts []models.Post
+	posts := []models.Post{}
 	if err = cursor.All(ctx, &posts); err != nil {
 		return nil, err
 	}

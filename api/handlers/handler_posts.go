@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/tomerg2/mini-hacker-news/api/dtos"
 	"github.com/tomerg2/mini-hacker-news/db_client"
 	"github.com/tomerg2/mini-hacker-news/repositories"
 	"net/http"
@@ -30,5 +31,8 @@ func GetPosts(c *gin.Context) {
 	elapsedTime := time.Since(startTime)
 	logrus.Infof("Fetching posts completed [posts=%d] [latency=%v]", len(posts), elapsedTime)
 
-	c.JSON(http.StatusOK, gin.H{"posts": posts})
+	response := dtos.ResponsePosts{
+		Posts: posts,
+	}
+	c.JSON(http.StatusOK, response)
 }
