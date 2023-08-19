@@ -1,17 +1,21 @@
 package handlers
 
 import (
+	"github.com/sirupsen/logrus"
+	"github.com/tomerg2/mini-hacker-news/repositories"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetPosts(c *gin.Context) {
-	// Mocking some sample data for demonstration
-	posts := []map[string]interface{}{
-		{"id": 1, "title": "Sample Post 1", "content": "This is the content of post 1."},
-		{"id": 2, "title": "Sample Post 2", "content": "This is the content of post 2."},
+	posts, err := repositories.GetPosts()
+	if err != nil {
+		logrus.Error("Failed to fetch posts")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
 	}
 
+	logrus.Infof("Fetch %d posts", len(posts))
 	c.JSON(http.StatusOK, gin.H{"posts": posts})
 }

@@ -1,10 +1,9 @@
 package main
 
 import (
-	"github.com/tomerg2/mini-hacker-news/api/routes"
-	"log"
-
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"github.com/tomerg2/mini-hacker-news/api/routes"
 )
 
 func main() {
@@ -14,6 +13,6 @@ func main() {
 	routes.InitializeRoutes(router)
 
 	if err := router.Run(":8080"); err != nil {
-		log.Fatal("Failed to start the server")
+		logrus.Fatal("Failed to start the server")
 	}
 }
