@@ -15,7 +15,7 @@ func GetPosts(c *gin.Context) {
 	logrus.Infof("Connecting to DB")
 	dbClient, err := db_client.GetMongoClient()
 	if err != nil {
-		logrus.Error("Failed connect to MongoDB")
+		logrus.Errorf("Failed connect to DB [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
@@ -24,7 +24,7 @@ func GetPosts(c *gin.Context) {
 	startTime := time.Now()
 	posts, err := repositories.GetPosts(dbClient)
 	if err != nil {
-		logrus.Error("Failed to fetch posts")
+		logrus.Errorf("Failed to fetch posts [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
