@@ -7,6 +7,7 @@ import (
 	"github.com/tomerg2/mini-hacker-news/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,8 +17,11 @@ func GetPosts(db *mongo.Database) ([]models.Post, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{"upvotes", -1}})
+
 	postsCollection := db.Collection(db_client.POSTS_COLLECTION)
-	cursor, err := postsCollection.Find(ctx, bson.M{})
+	cursor, err := postsCollection.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
