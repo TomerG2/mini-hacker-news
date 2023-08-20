@@ -70,3 +70,44 @@ func CreatePost(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func UpvotePost(c *gin.Context) {
+	//post := models.Post{}
+	//if err := c.BindJSON(&post); err != nil {
+	//	logrus.Errorf("Failed extract body [error=%s]", err.Error())
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	//	return
+	//}
+
+	logrus.Infof("Connecting to DB")
+	dbClient, err := db_client.GetMongoClient()
+	if err != nil {
+		logrus.Errorf("Failed connect to DB [error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	logrus.Infof("Upvote post")
+	startTime := time.Now()
+	err = repositories.UpvotePost(dbClient)
+	if err != nil {
+		logrus.Errorf("Failed to Upvote post [error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	elapsedTime := time.Since(startTime).Milliseconds()
+	logrus.Infof("Upvote post completed [milliseconds=%v]", elapsedTime)
+
+	logrus.Infof("Calculate post upvotes")
+	startTime = time.Now()
+	err = repositories.CalculatePostUpvotes(dbClient, "132")
+	if err != nil {
+		logrus.Errorf("Failed to calc post upvotes[error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	elapsedTime = time.Since(startTime).Milliseconds()
+	logrus.Infof("Calculate post upvotes completed [milliseconds=%v]", elapsedTime)
+
+	c.JSON(http.StatusOK, gin.H{})
+}

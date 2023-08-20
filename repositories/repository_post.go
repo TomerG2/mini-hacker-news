@@ -50,3 +50,11 @@ func CreatePost(db *mongo.Database, content string) (string, error) {
 		return "", fmt.Errorf("failed to extract post id")
 	}
 }
+
+func UpvotePost(db *mongo.Database) error {
+	return nil
+}
+
+func CalculatePostUpvotes(db *mongo.Database, postId string) error {
+	return nil
+}
