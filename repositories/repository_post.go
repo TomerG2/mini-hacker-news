@@ -51,8 +51,19 @@ func CreatePost(db *mongo.Database, content string) (string, error) {
 	}
 }
 
-func UpvotePost(db *mongo.Database) error {
-	return nil
+func UpvotePost(db *mongo.Database, upvote models.Upvote) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	postsCollection := db.Collection(db_client.UPVOTES_COLLECTION)
+	res, err := postsCollection.InsertOne(ctx, upvote)
+	if err != nil {
+		return "", err
+	}
+
+	oid, _ := res.InsertedID.(primitive.ObjectID)
+
+	return oid.Hex(), nil
 }
 
 func CalculatePostUpvotes(db *mongo.Database, postId string) error {

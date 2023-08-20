@@ -89,14 +89,14 @@ func UpvotePost(c *gin.Context) {
 
 	logrus.Infof("Upvote post")
 	startTime := time.Now()
-	err = repositories.UpvotePost(dbClient)
+	upvoteId, err := repositories.UpvotePost(dbClient, upvote)
 	if err != nil {
 		logrus.Errorf("Failed to Upvote post [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 	elapsedTime := time.Since(startTime).Milliseconds()
-	logrus.Infof("Upvote post completed [milliseconds=%v]", elapsedTime)
+	logrus.Infof("Upvote post completed [upvote_id=%s] [milliseconds=%v]", upvoteId, elapsedTime)
 
 	logrus.Infof("Calculate post upvotes")
 	startTime = time.Now()
