@@ -7,4 +7,5 @@ import (
 
 func InitializeRoutes(router *gin.Engine) {
 	router.GET("/posts", handlers.GetPosts)
+	router.POST("/posts", handlers.CreatePost)
 }
