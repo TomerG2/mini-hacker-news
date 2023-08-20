@@ -72,12 +72,12 @@ func CreatePost(c *gin.Context) {
 }
 
 func UpvotePost(c *gin.Context) {
-	//post := models.Post{}
-	//if err := c.BindJSON(&post); err != nil {
-	//	logrus.Errorf("Failed extract body [error=%s]", err.Error())
-	//	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-	//	return
-	//}
+	upvote := models.Upvote{}
+	if err := c.BindJSON(&upvote); err != nil {
+		logrus.Errorf("Failed extract body [error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
 
 	logrus.Infof("Connecting to DB")
 	dbClient, err := db_client.GetMongoClient()
