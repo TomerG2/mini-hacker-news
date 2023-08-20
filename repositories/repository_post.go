@@ -27,3 +27,7 @@ func GetPosts(db *mongo.Database) ([]models.Post, error) {
 	}
 	return posts, nil
 }
+
+func CreatePost(db *mongo.Database) (string, error) {
+	return "xyz", nil
+}

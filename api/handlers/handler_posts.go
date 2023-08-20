@@ -39,12 +39,23 @@ func GetPosts(c *gin.Context) {
 
 func CreatePost(c *gin.Context) {
 	logrus.Infof("Connecting to DB")
-	_, err := db_client.GetMongoClient()
+	dbClient, err := db_client.GetMongoClient()
 	if err != nil {
 		logrus.Errorf("Failed connect to DB [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	logrus.Infof("Create new post")
+	startTime := time.Now()
+	postId, err := repositories.CreatePost(dbClient)
+	if err != nil {
+		logrus.Errorf("Failed to create post [error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	elapsedTime := time.Since(startTime).Milliseconds()
+	logrus.Infof("Create post completed [postId=%s] [milliseconds=%v]", postId, elapsedTime)
+
+	c.JSON(http.StatusOK, gin.H{"post_id": postId})
 }
