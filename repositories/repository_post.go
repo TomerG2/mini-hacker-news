@@ -33,6 +33,7 @@ func GetPosts(db *mongo.Database) ([]models.Post, error) {
 func CreatePost(db *mongo.Database, content string) (string, error) {
 	post := models.Post{
 		Content: content,
+		Upvotes: 0,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -45,7 +46,7 @@ func CreatePost(db *mongo.Database, content string) (string, error) {
 	}
 
 	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
-		return oid.String(), nil
+		return oid.Hex(), nil
 	} else {
 		return "", fmt.Errorf("failed to extract post id")
 	}
@@ -66,7 +67,7 @@ func UpvotePost(db *mongo.Database, upvote models.Upvote) (string, error) {
 	return oid.Hex(), nil
 }
 
-func CalculatePostUpvotes(db *mongo.Database, postId string) error {
+func CalculatePostUpvotes(db *mongo.Database, postId primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

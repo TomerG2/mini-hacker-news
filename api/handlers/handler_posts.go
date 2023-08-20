@@ -100,7 +100,7 @@ func UpvotePost(c *gin.Context) {
 
 	logrus.Infof("Calculate post upvotes")
 	startTime = time.Now()
-	err = repositories.CalculatePostUpvotes(dbClient, upvote.PostID.Hex())
+	err = repositories.CalculatePostUpvotes(dbClient, upvote.PostID)
 	if err != nil {
 		logrus.Errorf("Failed to calc post upvotes[error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
