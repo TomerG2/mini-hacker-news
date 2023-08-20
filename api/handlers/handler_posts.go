@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tomerg2/mini-hacker-news/api/dtos"
 	"github.com/tomerg2/mini-hacker-news/db_client"
+	"github.com/tomerg2/mini-hacker-news/models"
 	"github.com/tomerg2/mini-hacker-news/repositories"
 	"net/http"
 	"time"
@@ -38,6 +39,13 @@ func GetPosts(c *gin.Context) {
 }
 
 func CreatePost(c *gin.Context) {
+	post := models.Post{}
+	if err := c.BindJSON(&post); err != nil {
+		logrus.Errorf("Failed extract body [error=%s]", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
 	logrus.Infof("Connecting to DB")
 	dbClient, err := db_client.GetMongoClient()
 	if err != nil {
@@ -48,7 +56,7 @@ func CreatePost(c *gin.Context) {
 
 	logrus.Infof("Create new post")
 	startTime := time.Now()
-	postId, err := repositories.CreatePost(dbClient)
+	postId, err := repositories.CreatePost(dbClient, post.Content)
 	if err != nil {
 		logrus.Errorf("Failed to create post [error=%s]", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
@@ -57,5 +65,8 @@ func CreatePost(c *gin.Context) {
 	elapsedTime := time.Since(startTime).Milliseconds()
 	logrus.Infof("Create post completed [postId=%s] [milliseconds=%v]", postId, elapsedTime)
 
-	c.JSON(http.StatusOK, gin.H{"post_id": postId})
+	response := dtos.ResponseCreatePost{
+		ID: postId,
+	}
+	c.JSON(http.StatusOK, response)
 }
