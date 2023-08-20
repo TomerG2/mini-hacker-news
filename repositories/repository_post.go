@@ -67,5 +67,17 @@ func UpvotePost(db *mongo.Database, upvote models.Upvote) (string, error) {
 }
 
 func CalculatePostUpvotes(db *mongo.Database, postId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	postsCollection := db.Collection(db_client.POSTS_COLLECTION)
+	filter := bson.M{"_id": postId}
+	update := bson.M{"$inc": bson.M{"upvotes": 1}}
+
+	_, err := postsCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
